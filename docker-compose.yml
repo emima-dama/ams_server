@@ -1,0 +1,338 @@
+version: '3'
+services:
+
+  postgres-auth:
+    container_name: postgres-auth
+    image: postgres:alpine
+    networks:
+      - spring-cloud-network
+    ports:
+      - 5431:5431
+    expose:
+      - 5431
+    environment:
+      - POSTGRES_DB=auth-db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=ams
+    volumes:
+      - postgres-data:/val/lib/postgresql/dat
+  #    restart: always
+
+  postgres-attendance:
+    container_name: postgres-attendance
+    image: postgres:alpine
+    networks:
+    - spring-cloud-network
+    ports:
+    - 5433:5433
+    expose:
+    - 5433
+    environment:
+    - POSTGRES_DB=attendance-db
+    - POSTGRES_USER=attendance
+    - POSTGRES_PASSWORD=ams
+    volumes:
+    - postgres-data:/val/lib/postgresql/dat
+    #    restart: always
+
+  #
+#  postgres-assignment:
+#    container_name: postgres-assignment
+#    image: postgres:alpine
+#    networks:
+#      - spring-cloud-network
+#    ports:
+#      - 5434:5434
+#    expose:
+#      - 5434
+#    environment:
+#      - POSTGRES_DB=assignment-db
+#      - POSTGRES_USER=assignment
+#      - POSTGRES_PASSWORD=ams
+#    volumes:
+#      - postgres-data:/val/lib/postgresql/dat
+#    #    restart: always
+#
+  postgres-subject:
+    container_name: postgres-subject
+    image: postgres:alpine
+    networks:
+      - spring-cloud-network
+    ports:
+      - 5435:5435
+    expose:
+      - 5435
+    environment:
+      - POSTGRES_DB=subject-db
+      - POSTGRES_USER=subject
+      - POSTGRES_PASSWORD=ams
+    volumes:
+      - postgres-data:/val/lib/postgresql/dat
+    #    restart: always
+#
+#  postgres-student:
+#    container_name: postgres-student
+#    image: postgres:alpine
+#    networks:
+#      - spring-cloud-network
+#    ports:
+#      - 5436:5436
+#    expose:
+#      - 5436
+#    environment:
+#      - POSTGRES_DB=student-db
+#      - POSTGRES_USER=student
+#      - POSTGRES_PASSWORD=ams
+#    volumes:
+#    - postgres-data:/val/lib/postgresql/dat
+#    #    restart: always
+
+  config-service:
+    container_name: config-service
+    build:
+      context: .
+      dockerfile: config-service/Dockerfile
+    image: config-service
+    #    volumes:
+    #      - config-service-data: /var/lib/config-data
+    #Date necesare pentru conectarea microserviciilor cu registry-service si cu baza de date
+#    environment:
+#    - DEUREKA_SERVER=http://registry-service:8761/eureka/
+    ports:
+      - 8888:8888
+    networks:
+      - spring-cloud-network
+    logging:
+      driver: json-file
+    depends_on:
+      - postgres-auth
+      - postgres-attendance
+#      - postgres-assignment
+#      - postgres-subject
+    links:
+      - postgres-auth:postgres-auth
+      - postgres-attendance:postgres-attendance
+#      - postgres-assignment:postgres-assignment
+#      - postgres-subject
+#    restart: always
+
+  auth-service:
+    container_name: auth-service
+    build:
+      context: .
+      dockerfile: auth-server/Dockerfile
+    image: auth-service
+    environment:
+      WAIT_HOSTS: config-service:8888
+      WAIT_HOSTS_TIMEOUT: 300
+      WAIT_SLEEP_INTERVAL: 60
+      WAIT_HOST_CONNECT_TIMEOUT: 60
+      SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}}}'
+    depends_on:
+      - config-service
+      - postgres-auth
+    command: sh -c "/wait"
+    expose:
+      - 8081
+    ports:
+      - 8081:8081
+    networks:
+      - spring-cloud-network
+    logging:
+      driver: json-file
+    links:
+      - config-service:config-service
+      - postgres-auth:postgres-auth
+#    restart: on-failure
+
+  #  TODO: resolve error no-main-manifest-attribute app.jar
+  attendance-service:
+    container_name: attendance-service
+    build:
+      context: .
+      dockerfile: attendance-service/Dockerfile
+    image: attendance-service
+    environment:
+      WAIT_HOSTS: config-service:8888
+      WAIT_HOSTS_TIMEOUT: 300
+      WAIT_SLEEP_INTERVAL: 60
+      WAIT_HOST_CONNECT_TIMEOUT: 60
+      SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}}}'
+    depends_on:
+    - config-service
+    - postgres-attendance
+    command: sh -c "/wait"
+    #    expose:
+    #      - 8082
+    ports:
+    - 8082
+    networks:
+    - spring-cloud-network
+    logging:
+      driver: json-file
+    links:
+    - config-service:config-service
+    - postgres-attendance:postgres-attendance
+    #    restart: always
+
+#
+#  assignment-service:
+#    container_name: assignment-service
+#    build:
+#      context: .
+#      dockerfile: assignment-service/Dockerfile
+#    image: assignment-service
+#    environment:
+#      WAIT_HOSTS: config-service:8888
+#      WAIT_HOSTS_TIMEOUT: 300
+#      WAIT_SLEEP_INTERVAL: 60
+#      WAIT_HOST_CONNECT_TIMEOUT: 60
+#      SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}}}'
+#    depends_on:
+#      - config-service
+#      - postgres-assignment
+#    command: sh -c "/wait"
+#    expose:
+#      - 8083
+#    ports:
+#      - 8083:8083
+#    networks:
+#      - spring-cloud-network
+#    logging:
+#      driver: json-file
+#    links:
+#      - config-service:config-service
+#      - postgres-assignment:postgres-assignment
+##    restart: on-failure
+#
+  subject-service:
+    container_name: subject-service
+    build:
+      context: .
+      dockerfile: subject-service/Dockerfile
+    image: subject-service
+    environment:
+      WAIT_HOSTS: config-service:8888
+      WAIT_HOSTS_TIMEOUT: 300
+      WAIT_SLEEP_INTERVAL: 60
+      WAIT_HOST_CONNECT_TIMEOUT: 60
+      SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}}}'
+    depends_on:
+      - config-service
+      - postgres-subject
+    command: sh -c "/wait"
+#    expose:
+#      - 8084
+    ports:
+      - 8084
+    networks:
+      - spring-cloud-network
+    logging:
+      driver: json-file
+    links:
+      - config-service:config-service
+      - postgres-subject:postgres-subject
+#    restart: on-failure
+#
+#  student-service:
+#    container_name: student-service
+#    build:
+#      context: .
+#      dockerfile: student-service/Dockerfile
+#    image: student-service
+#    environment:
+#      WAIT_HOSTS: config-service:8888
+#      WAIT_HOSTS_TIMEOUT: 300
+#      WAIT_SLEEP_INTERVAL: 60
+#      WAIT_HOST_CONNECT_TIMEOUT: 60
+#      SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}}}'
+#    depends_on:
+#      - config-service
+#      - postgres-student
+#    command: sh -c "/wait"
+#    #    expose:
+#    #      - 8084
+#    ports:
+#      - 8085
+#    networks:
+#      - spring-cloud-network
+#    logging:
+#      driver: json-file
+#    links:
+#      - config-service:config-service
+#      - postgres-student:postgres-student
+#    restart: on-failure
+#
+
+
+  registry-service:
+    container_name: registry-service
+    build:
+      context: .
+      dockerfile: registry-service/Dockerfile
+    image: registry-service
+    environment:
+      WAIT_HOSTS: config-service:8888
+      WAIT_HOSTS_TIMEOUT: 300
+      WAIT_SLEEP_INTERVAL: 60
+      WAIT_HOST_CONNECT_TIMEOUT: 60
+      SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}}}'
+    command: sh -c "/wait"
+    expose:
+      - 8761
+    ports:
+      - 8761:8761
+    networks:
+      - spring-cloud-network
+    depends_on:
+      - config-service
+    logging:
+      driver: json-file
+    links:
+      - config-service:config-service
+    restart: on-failure
+#    volumes:
+#      - registry-service-data: var/lib/registry-data
+
+  gateway-service:
+    container_name: gateway-service
+    build:
+      context: .
+      dockerfile: gateway-service/Dockerfile
+    image: gateway-service
+    environment:
+      WAIT_HOSTS: config-service:8888
+      WAIT_HOSTS_TIMEOUT: 300
+      WAIT_SLEEP_INTERVAL: 90
+      WAIT_HOST_CONNECT_TIMEOUT: 90
+      SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}}}'
+    command: sh -c "/wait"
+    expose:
+      - 8080
+    ports:
+      - 8080:8080
+    networks:
+      - spring-cloud-network
+    depends_on:
+      - config-service
+      - registry-service
+      - auth-service
+      - attendance-service
+#      - assignment-service
+#      - subject-service
+#      - student-service
+    logging:
+      driver: json-file
+    links:
+      - config-service:config-service
+      - registry-service:registry-service
+    restart: on-failure
+
+networks:
+  spring-cloud-network:
+    driver: bridge
+
+volumes:
+  config-service-data:
+  registry-service-data:
+  postgres-data:
