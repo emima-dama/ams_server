@@ -1,5 +1,7 @@
 package ro.ubbcluj.cs.ams.auth.controller;
 
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -9,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.util.LinkedMultiValueMap;
@@ -23,10 +26,14 @@ import ro.ubbcluj.cs.ams.auth.service.UserDetailsServiceImpl;
 import ro.ubbcluj.cs.ams.auth.service.exception.AuthExceptionType;
 import ro.ubbcluj.cs.ams.auth.service.exception.AuthServiceException;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Metrics;
+
 import javax.validation.Valid;
 import java.security.Principal;
 
 @RestController
+@Timed
 public class AuthController {
 
     @Autowired
@@ -39,6 +46,23 @@ public class AuthController {
     private UserDetailsServiceImpl service;
 
     private Logger logger = LoggerFactory.getLogger(AuthController.class);
+
+    private final Counter counter;
+
+    public AuthController(MeterRegistry registry) {
+
+        this.counter = registry.counter("auth.messages","type","requests");
+
+    }
+
+    @Scheduled(fixedRate = 5000)
+    @Timed(description = "Time spent serving orders")
+    public void verifyNrOfReq() throws InterruptedException {
+        if (counter.count() > 2.0) {
+            logger.info("!!!!Needs to create another instance!!!!!");
+            Thread.sleep(1000);
+        }
+    }
 
     @GetMapping("/current")
     public Principal getUser(Principal principal) {
@@ -57,6 +81,8 @@ public class AuthController {
         logger.info("===========username: {}==========", userDto.getUsername());
         logger.info("===========password: {}==========", userDto.getPassword());
 
+        increaseCount(userDto.getPassword(),"login");
+
         if (result.hasErrors()) {
             logger.error("==========login failed==========");
             logger.error("Unexpected data!");
@@ -72,6 +98,8 @@ public class AuthController {
         byte[] encodedAuth = Base64.encodeBase64(
                 auth.getBytes());
         String authHeader = "Basic " + new String(encodedAuth);
+
+        this.counter.increment();
 
         OAuth2AccessToken accessToken = webClientBuilder
                 .build()
@@ -112,4 +140,12 @@ public class AuthController {
         return new ResponseEntity<>("Account with username "+username+" exists ",HttpStatus.OK);
     }
 
+
+    private void increaseCount(String userId, String state) {
+        // Counter class stores the measurement name and the tags and
+        // their values
+        Counter counter =Metrics.counter("request.users",  "userId",
+                userId, "state", state);
+        counter.increment();
+    }
 }

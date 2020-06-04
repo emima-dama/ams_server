@@ -21,3 +21,32 @@ eureka:
     fetch-registry: true
 
 separator.barcode : "--"
+
+management:
+  #  port: 9000
+  security:
+    enable: false
+  endpoints:
+    web:
+      base-path: /attendance-actuator
+      exposure:
+        include: health, shutdown, prometheus, metrics
+  endpoint:
+    shutdown:
+      enable: true
+  #    health:
+  #      show-details: always
+  metrics:
+    export:
+      #      influx:
+      #        auto-create-db: true
+      #        db: springboot
+      #        uri: http://localhost:8086
+      prometheus:
+        enabled: true
+    use-global-registry: false
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true   #Auto-configuration enables the instrumentation of all requests handled by Spring MVC

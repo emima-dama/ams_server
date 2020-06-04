@@ -20,6 +20,6 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
         http.csrf().disable()
                 .anonymous().disable()
                 .authorizeRequests()
-                .antMatchers("/current").authenticated();
+                .antMatchers("/current","/auth-actuator**").authenticated();
     }
 }

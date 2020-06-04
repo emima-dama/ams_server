@@ -20,9 +20,9 @@ zuul:
       path: /authentication/** #path that will be intercepted
       serviceId: auth-service #which url the request will be mapped to
       stripPrefix: false #if zuul should replace the "/authentication/" segment
-    attendance-server:
+    attendance-service:
       path: /attendance/**
-      serviceId: attendance-server
+      serviceId: attendance-service
       stripPrefix: false
     assignment-service:
       path: /assignment/**

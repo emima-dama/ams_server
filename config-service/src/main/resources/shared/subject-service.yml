@@ -3,17 +3,17 @@ server:
     context-path: /subject
   port: ${PORT:0} #dynamic port
 
-management:
-  #  port: 9000
-  security:
-    enable: false
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    shutdown:
-      enable: true
+#management:
+#  #  port: 9000
+#  security:
+#    enable: false
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
+#  endpoint:
+#    shutdown:
+#      enable: true
 #    metrics:
 #      enable: true
 #  metrics:
