@@ -10,6 +10,7 @@
         <module name="config-service" />
         <module name="gateway-service" />
         <module name="registry-service" />
+        <module name="student-service" />
         <module name="utils" />
       </profile>
       <profile name="Annotation profile for ro.ubbcluj.cs.ams-server" enabled="true">
@@ -32,17 +33,20 @@
           <entry name="$MAVEN_REPOSITORY$/joda-time/joda-time/2.9/joda-time-2.9.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.4/lombok-1.18.4.jar" />
         </processorPath>
+        <module name="assignment-service" />
         <module name="attendance-service" />
         <module name="subject-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="ams_server" target="1.8" />
+      <module name="assignment-service" target="1.8" />
       <module name="attendance-service" target="1.8" />
       <module name="auth-service" target="1.8" />
       <module name="config-service" target="1.8" />
       <module name="gateway-service" target="1.8" />
       <module name="registry-service" target="1.8" />
+      <module name="student-service" target="1.8" />
       <module name="subject-service" target="1.8" />
       <module name="utils" target="1.8" />
     </bytecodeTargetLevel>

@@ -1,0 +1,9 @@
+server:
+  servlet:
+    context-path: /student
+  port: ${PORT:0} #dynamic port
+
+#management:
+#  endpoints:
+#    web:
+#      base-path: /student-actuator

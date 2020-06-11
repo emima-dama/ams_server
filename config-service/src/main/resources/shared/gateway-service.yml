@@ -4,11 +4,11 @@ hystrix:
       execution:
         isolation:
           thread:
-            timeoutInMilliseconds: 91000
+            timeoutInMilliseconds: 91000 #Întreruperea solicitării serviciului de siguranță
 
 ribbon:
-  ReadTimeout: 30000
-  ConnectTimeout: 15000
+  ReadTimeout: 30000 #Perioada de procesare a cererii după ce conectarea este stabilită
+  ConnectTimeout: 15000 #Perioadă de timp pentru stabilirea conexiunii
 
 zuul:
   sensitiveHeaders: Cookie,Set-Cookie
@@ -31,10 +31,6 @@ zuul:
     subject-service:
       path: /subject/**
       serviceId: subject-service
-      stripPrefix: false
-    material-service:
-      path: /material/**
-      serviceId: material-service
       stripPrefix: false
     student-service:
       path: /student/**

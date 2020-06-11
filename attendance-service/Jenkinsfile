@@ -1,0 +1,12 @@
+pipeline {
+    agent any
+    triggers {
+        cron('* * * * *')
+    }
+    environment {
+        SERVICE_NAME = "ATTENDANCE-SERVICE"
+        METRICS_ENDPOINT = "/attendance-actuator/metrics/tomcat.threads.busy?tag=name:http-nio-auto-1"
+        SHUTDOWN_ENDPOINT = "/attendance-actuator/shutdown"
+    }
+    stages { ... }
+}

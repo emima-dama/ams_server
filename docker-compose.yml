@@ -16,8 +16,6 @@ services:
       - POSTGRES_PASSWORD=ams
     volumes:
       - postgres-data:/val/lib/postgresql/dat
-  #    restart: always
-
   postgres-attendance:
     container_name: postgres-attendance
     image: postgres:alpine
@@ -33,26 +31,23 @@ services:
     - POSTGRES_PASSWORD=ams
     volumes:
     - postgres-data:/val/lib/postgresql/dat
-    #    restart: always
 
-  #
-#  postgres-assignment:
-#    container_name: postgres-assignment
-#    image: postgres:alpine
-#    networks:
-#      - spring-cloud-network
-#    ports:
-#      - 5434:5434
-#    expose:
-#      - 5434
-#    environment:
-#      - POSTGRES_DB=assignment-db
-#      - POSTGRES_USER=assignment
-#      - POSTGRES_PASSWORD=ams
-#    volumes:
-#      - postgres-data:/val/lib/postgresql/dat
-#    #    restart: always
-#
+  postgres-assignment:
+    container_name: postgres-assignment
+    image: postgres:alpine
+    networks:
+      - spring-cloud-network
+    ports:
+      - 5434:5434
+    expose:
+      - 5434
+    environment:
+      - POSTGRES_DB=assignment-db
+      - POSTGRES_USER=assignment
+      - POSTGRES_PASSWORD=ams
+    volumes:
+      - postgres-data:/val/lib/postgresql/dat
+    #    restart: always
   postgres-subject:
     container_name: postgres-subject
     image: postgres:alpine
@@ -69,36 +64,22 @@ services:
     volumes:
       - postgres-data:/val/lib/postgresql/dat
     #    restart: always
-#
-#  postgres-student:
-#    container_name: postgres-student
-#    image: postgres:alpine
-#    networks:
-#      - spring-cloud-network
-#    ports:
-#      - 5436:5436
-#    expose:
-#      - 5436
-#    environment:
-#      - POSTGRES_DB=student-db
-#      - POSTGRES_USER=student
-#      - POSTGRES_PASSWORD=ams
-#    volumes:
-#    - postgres-data:/val/lib/postgresql/dat
-#    #    restart: always
-
-#  influx-auth:
-#    image: influxdb:latest
-#    container_name: influx-auth
-#    environment:
-#      - INFLUXDB_DB=auth-influxdb
-#      - INFLUXDB_ADMIN_USER=auth
-#      - INFLUXDB_ADMIN_PASSWORD=ams
-#    ports:
-#      - 8186:8186
-#    networks:
-#      - monitoring
-
+  postgres-student:
+    container_name: postgres-student
+    image: postgres:alpine
+    networks:
+      - spring-cloud-network
+    ports:
+      - 5436:5436
+    expose:
+      - 5436
+    environment:
+      - POSTGRES_DB=student-db
+      - POSTGRES_USER=student
+      - POSTGRES_PASSWORD=ams
+    volumes:
+    - postgres-data:/val/lib/postgresql/dat
+    #    restart: always
   config-service:
     container_name: config-service
     build:
@@ -124,10 +105,6 @@ services:
     links:
       - postgres-auth:postgres-auth
       - postgres-attendance:postgres-attendance
-#      - postgres-assignment:postgres-assignment
-#      - postgres-subject
-#    restart: always
-
   auth-service:
     container_name: auth-service
     build:
@@ -144,7 +121,6 @@ services:
       - config-service
       - postgres-auth
       - registry-service
-#      - influx-auth
     command: sh -c "/wait"
     expose:
       - 8081
@@ -157,17 +133,17 @@ services:
     links:
       - config-service:config-service
       - postgres-auth:postgres-auth
-#    restart: on-failure
+    restart: on-failure
 
-  #  TODO: resolve error no-main-manifest-attribute app.jar
+    #  TODO: resolve error no-main-manifest-attribute app.jar
   attendance-service:
-    container_name: attendance-service
+    container_name: attendance-service   #TODO: need to be removed for scaling
     build:
       context: .
       dockerfile: attendance-service/Dockerfile
     image: attendance-service
     environment:
-      WAIT_HOSTS: config-service:8888, registry-service:8761
+      WAIT_HOSTS: config-service:8888
       WAIT_HOSTS_TIMEOUT: 300
       WAIT_SLEEP_INTERVAL: 60
       WAIT_HOST_CONNECT_TIMEOUT: 60
@@ -177,8 +153,6 @@ services:
     - postgres-attendance
     - registry-service
     command: sh -c "/wait"
-    #    expose:
-    #      - 8082
     ports:
     - 8082
     networks:
@@ -189,16 +163,14 @@ services:
     - config-service:config-service
     - postgres-attendance:postgres-attendance
     #    restart: always
-
-#
 #  assignment-service:
-#    container_name: assignment-service
+##    container_name: assignment-service
 #    build:
 #      context: .
 #      dockerfile: assignment-service/Dockerfile
 #    image: assignment-service
 #    environment:
-#      WAIT_HOSTS: config-service:8888
+#      WAIT_HOSTS: config-service:8888, registry-service:8761
 #      WAIT_HOSTS_TIMEOUT: 300
 #      WAIT_SLEEP_INTERVAL: 60
 #      WAIT_HOST_CONNECT_TIMEOUT: 60
@@ -207,10 +179,10 @@ services:
 #      - config-service
 #      - postgres-assignment
 #    command: sh -c "/wait"
-#    expose:
-#      - 8083
+##    expose:
+##      - 8083
 #    ports:
-#      - 8083:8083
+#      - 8083
 #    networks:
 #      - spring-cloud-network
 #    logging:
@@ -218,10 +190,8 @@ services:
 #    links:
 #      - config-service:config-service
 #      - postgres-assignment:postgres-assignment
-##    restart: on-failure
-#
   subject-service:
-    container_name: subject-service
+    container_name: subject-service  #TODO: need to be removed for scaling
     build:
       context: .
       dockerfile: subject-service/Dockerfile
@@ -247,8 +217,6 @@ services:
     links:
       - config-service:config-service
       - postgres-subject:postgres-subject
-#    restart: on-failure
-#
 #  student-service:
 #    container_name: student-service
 #    build:
@@ -256,7 +224,7 @@ services:
 #      dockerfile: student-service/Dockerfile
 #    image: student-service
 #    environment:
-#      WAIT_HOSTS: config-service:8888
+#      WAIT_HOSTS: config-service:8888, registry-service:8761
 #      WAIT_HOSTS_TIMEOUT: 300
 #      WAIT_SLEEP_INTERVAL: 60
 #      WAIT_HOST_CONNECT_TIMEOUT: 60
@@ -276,9 +244,6 @@ services:
 #    links:
 #      - config-service:config-service
 #      - postgres-student:postgres-student
-#    restart: on-failure
-#
-
 
   registry-service:
     container_name: registry-service
@@ -305,9 +270,7 @@ services:
       driver: json-file
     links:
       - config-service:config-service
-    restart: on-failure
-#    volumes:
-#      - registry-service-data: var/lib/registry-data
+#    restart: on-failure
 
   gateway-service:
     container_name: gateway-service
@@ -334,7 +297,7 @@ services:
       - auth-service
       - attendance-service
 #      - assignment-service
-#      - subject-service
+      - subject-service
 #      - student-service
     logging:
       driver: json-file
@@ -347,7 +310,6 @@ networks:
   spring-cloud-network:
     driver: bridge
   monitoring:
-
 
 volumes:
   config-service-data:

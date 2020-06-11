@@ -20,7 +20,6 @@ grant-type: #password grant-type secret
     pass: pecai98
 
 management:
-  #  port: 9000
   security:
     enable: false
   endpoints:
@@ -31,14 +30,8 @@ management:
   endpoint:
     shutdown:
       enable: true
-  #    health:
-  #      show-details: always
   metrics:
     export:
-      #      influx:
-      #        auto-create-db: true
-      #        db: springboot
-      #        uri: http://localhost:8086
       prometheus:
         enabled: true
     use-global-registry: false

@@ -6,10 +6,10 @@ import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ro.ubbcluj.cs.ams.attendance.dao.attendanceDao.AttendanceDao;
-//import ro.ubbcluj.cs.ams.attendance.dao.attendanceInfoDao.impl.AttendanceInfoDaoImpl;
-//import ro.ubbcluj.cs.ams.attendance.model.Tables;
-//import ro.ubbcluj.cs.ams.attendance.model.tables.pojos.Attendance;
-//import ro.ubbcluj.cs.ams.attendance.model.tables.records.AttendanceRecord;
+import ro.ubbcluj.cs.ams.attendance.dao.attendanceInfoDao.impl.AttendanceInfoDaoImpl;
+import ro.ubbcluj.cs.ams.attendance.model.Tables;
+import ro.ubbcluj.cs.ams.attendance.model.tables.pojos.Attendance;
+import ro.ubbcluj.cs.ams.attendance.model.tables.records.AttendanceRecord;
 
 
 @Component
@@ -20,17 +20,17 @@ public class AttendanceDaoImpl implements AttendanceDao {
 
     private final Logger logger = LogManager.getLogger(AttendanceDaoImpl.class);
 
-//    @Override
-//    public AttendanceRecord addAttendance(Attendance attendance) {
-//
-//        logger.info("+++++++++++ Before addAttendance :"+attendance+"++++++++++++++++");
-//
-//        AttendanceRecord attendanceRecord = dsl.insertInto(Tables.ATTENDANCE,Tables.ATTENDANCE.STUDENT_ID,Tables.ATTENDANCE.CREATED_AT,Tables.ATTENDANCE.ATTENDANCE_INFO_ID)
-//                                        .values(attendance.getStudentId(),attendance.getCreatedAt(),attendance.getAttendanceInfoId())
-//                                        .returning()
-//                                        .fetchOne();
-//
-//        logger.info("+++++ After add action ++++++++++");
-//        return attendanceRecord;
-//    }
+    @Override
+    public AttendanceRecord addAttendance(Attendance attendance) {
+
+        logger.info("+++++++++++ Before addAttendance :"+attendance+"++++++++++++++++");
+
+        AttendanceRecord attendanceRecord = dsl.insertInto(Tables.ATTENDANCE,Tables.ATTENDANCE.STUDENT_ID,Tables.ATTENDANCE.CREATED_AT,Tables.ATTENDANCE.ATTENDANCE_INFO_ID)
+                                        .values(attendance.getStudentId(),attendance.getCreatedAt(),attendance.getAttendanceInfoId())
+                                        .returning()
+                                        .fetchOne();
+
+        logger.info("+++++ After add action ++++++++++");
+        return attendanceRecord;
+    }
 }

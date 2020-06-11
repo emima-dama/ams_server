@@ -24,5 +24,3 @@ scrape_configs:
   - job_name: 'spring-actuator'
     metrics_path: '/attendance-actuator/prometheus'
     scrape_interval: 5s
-    static_configs:
-    - targets: ['127.0.0.1:8081']

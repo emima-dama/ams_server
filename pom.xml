@@ -27,14 +27,8 @@
         <module>utils</module>
         <module>attendance-service</module>
         <module>subject-service</module>
-        <!--<module>registry-service</module>-->
-        <!--<module>gateway-service</module>-->
-        <!--<module>attendance-server</module>-->
-        <!--<module>subject-service</module>-->
-        <!--<module>assignment-service</module>-->
-        <!--<module>utils</module>-->
-        <!--<module>material-service</module>-->
-        <!--<module>student-service</module>-->
+        <module>student-service</module>
+        <module>assignment-service</module>
     </modules>
 
     <properties>

@@ -1,7 +1,7 @@
 server:
   servlet:
     context-path: /attendance
-  port: ${PORT:0} #TODO: change to dynamic port
+  port: ${PORT:0}
 
 #management:
 #  #  port: 9000

@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-//@EnablePrometheusScraping
 @EnableScheduling
 public class AuthorizationServerApplication {
 
