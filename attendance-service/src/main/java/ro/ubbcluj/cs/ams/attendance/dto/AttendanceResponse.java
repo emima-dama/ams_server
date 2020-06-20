@@ -10,6 +10,6 @@ import lombok.*;
 @Builder
 public class AttendanceResponse {
 
-    private String course; //TODO : numele cursului
-    private Integer activity; //TODO : numele activity
+    private String course;
+    private String activity;
 }

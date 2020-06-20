@@ -8,5 +8,5 @@ public interface AttendanceInfoDao {
 
     Integer addAttendanceInfo(AttendanceInfo attendanceInfo);
 
-    AttendanceInfoRecord findById(Integer id);
+    AttendanceInfoRecord findByCode(String code);
 }

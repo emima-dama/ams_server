@@ -7,7 +7,9 @@ eureka:
   client:
     service-url:
       defaultZone: http://registry-service:8761/eureka/ #where our registry server is located
-
+  server:
+#    enable-self-preservation: false
+    peer-node-read-timeout-ms: 90000
 security:
   oauth2:
     resource:

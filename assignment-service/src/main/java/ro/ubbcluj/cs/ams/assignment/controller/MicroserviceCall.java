@@ -24,8 +24,8 @@ public class MicroserviceCall {
 
     public void checkIfProfessorTeachesSpecificActivityTypeForASubject(String subjectId, int activityTypeId, String professorUsername) {
 
-        logger.info(" ========= LOGGING check if a professor teaches specific activity type for a subject");
-        logger.info("Call subject microservice ========== ");
+        logger.info(" >>>>>>>>>>>>>>>> LOGGING check if a professor teaches specific activity type for a subject <<<<<<<<<<<<<<<<");
+        logger.info(" >>>>>>>>>>>>>>>> Call subject microservice <<<<<<<<<<<<<<<<");
         try {
             String path = "http://subject-service/subject/assign?subjectId=" + subjectId + "&activityTypeId=" + activityTypeId + "&professorUsername=" + professorUsername;
             String response = webClientBuilder

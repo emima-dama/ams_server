@@ -5,6 +5,7 @@ create table attendance_info (
   professor_id varchar(128),
   created_at timestamp,
   remaining_time int, --minutes
+  code varchar(128),
   constraint pk_attendance_info primary key (id)
 );
 

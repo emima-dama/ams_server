@@ -23,8 +23,6 @@ eureka:
 separator.barcode : "--"
 
 management:
-  #  port: 9000
-  security:
     enable: false
   endpoints:
     web:
@@ -38,10 +36,6 @@ management:
   #      show-details: always
   metrics:
     export:
-      #      influx:
-      #        auto-create-db: true
-      #        db: springboot
-      #        uri: http://localhost:8086
       prometheus:
         enabled: true
     use-global-registry: false
@@ -50,3 +44,12 @@ management:
         request:
           autotime:
             enabled: true   #Auto-configuration enables the instrumentation of all requests handled by Spring MVC
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+      sla:
+        http:
+          server:
+            requests: 100ms,150ms,250ms,500ms,1s

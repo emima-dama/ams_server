@@ -10,7 +10,6 @@
         <module name="config-service" />
         <module name="gateway-service" />
         <module name="registry-service" />
-        <module name="student-service" />
         <module name="utils" />
       </profile>
       <profile name="Annotation profile for ro.ubbcluj.cs.ams-server" enabled="true">
@@ -35,6 +34,7 @@
         </processorPath>
         <module name="assignment-service" />
         <module name="attendance-service" />
+        <module name="student-service" />
         <module name="subject-service" />
       </profile>
     </annotationProcessing>

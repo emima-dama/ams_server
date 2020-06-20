@@ -20,17 +20,17 @@ services:
     container_name: postgres-attendance
     image: postgres:alpine
     networks:
-    - spring-cloud-network
+      - spring-cloud-network
     ports:
-    - 5433:5433
+      - 5433:5433
     expose:
-    - 5433
+      - 5433
     environment:
-    - POSTGRES_DB=attendance-db
-    - POSTGRES_USER=attendance
-    - POSTGRES_PASSWORD=ams
+      - POSTGRES_DB=attendance-db
+      - POSTGRES_USER=attendance
+      - POSTGRES_PASSWORD=ams
     volumes:
-    - postgres-data:/val/lib/postgresql/dat
+      - postgres-data:/val/lib/postgresql/dat
 
   postgres-assignment:
     container_name: postgres-assignment
@@ -78,7 +78,7 @@ services:
       - POSTGRES_USER=student
       - POSTGRES_PASSWORD=ams
     volumes:
-    - postgres-data:/val/lib/postgresql/dat
+      - postgres-data:/val/lib/postgresql/dat
     #    restart: always
   config-service:
     container_name: config-service
@@ -86,11 +86,6 @@ services:
       context: .
       dockerfile: config-service/Dockerfile
     image: config-service
-    #    volumes:
-    #      - config-service-data: /var/lib/config-data
-    #Date necesare pentru conectarea microserviciilor cu registry-service si cu baza de date
-#    environment:
-#    - DEUREKA_SERVER=http://registry-service:8761/eureka/
     ports:
       - 8888:8888
     networks:
@@ -100,8 +95,8 @@ services:
     depends_on:
       - postgres-auth
       - postgres-attendance
-#      - postgres-assignment
-#      - postgres-subject
+      - postgres-assignment
+      - postgres-subject
     links:
       - postgres-auth:postgres-auth
       - postgres-attendance:postgres-attendance
@@ -112,10 +107,10 @@ services:
       dockerfile: auth-server/Dockerfile
     image: auth-service
     environment:
-      WAIT_HOSTS: config-service:8888
-      WAIT_HOSTS_TIMEOUT: 300
-      WAIT_SLEEP_INTERVAL: 60
-      WAIT_HOST_CONNECT_TIMEOUT: 60
+      WAIT_HOSTS: config-service:8888, registry-service:8761
+      WAIT_HOSTS_TIMEOUT: 900
+      WAIT_SLEEP_INTERVAL: 120
+      WAIT_HOST_CONNECT_TIMEOUT: 120
       SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}}}'
     depends_on:
       - config-service
@@ -135,76 +130,78 @@ services:
       - postgres-auth:postgres-auth
     restart: on-failure
 
-    #  TODO: resolve error no-main-manifest-attribute app.jar
   attendance-service:
-    container_name: attendance-service   #TODO: need to be removed for scaling
+#    container_name: attendance-service
     build:
       context: .
       dockerfile: attendance-service/Dockerfile
     image: attendance-service
     environment:
-      WAIT_HOSTS: config-service:8888
-      WAIT_HOSTS_TIMEOUT: 300
-      WAIT_SLEEP_INTERVAL: 60
-      WAIT_HOST_CONNECT_TIMEOUT: 60
-      SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}}}'
+      WAIT_HOSTS: config-service:8888, registry-service:8761
+      WAIT_HOSTS_TIMEOUT: 900
+      WAIT_SLEEP_INTERVAL: 120
+      WAIT_HOST_CONNECT_TIMEOUT: 120
+      SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}} , "eureka" :{"client" :{"service-url": {"defaultZone": "http://registry-service:8761/eureka/"}}}}'
     depends_on:
-    - config-service
-    - postgres-attendance
-    - registry-service
+      - config-service
+      - postgres-attendance
+      - registry-service
     command: sh -c "/wait"
     ports:
-    - 8082
+      - 8082
     networks:
-    - spring-cloud-network
+      - spring-cloud-network
     logging:
       driver: json-file
     links:
-    - config-service:config-service
-    - postgres-attendance:postgres-attendance
-    #    restart: always
-#  assignment-service:
-##    container_name: assignment-service
-#    build:
-#      context: .
-#      dockerfile: assignment-service/Dockerfile
-#    image: assignment-service
-#    environment:
-#      WAIT_HOSTS: config-service:8888, registry-service:8761
-#      WAIT_HOSTS_TIMEOUT: 300
-#      WAIT_SLEEP_INTERVAL: 60
-#      WAIT_HOST_CONNECT_TIMEOUT: 60
-#      SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}}}'
-#    depends_on:
-#      - config-service
-#      - postgres-assignment
-#    command: sh -c "/wait"
-##    expose:
-##      - 8083
-#    ports:
+      - config-service:config-service
+      - postgres-attendance:postgres-attendance
+#    restart: on-failure
+
+  assignment-service:
+#    container_name: assignment-service
+    build:
+      context: .
+      dockerfile: assignment-service/Dockerfile
+    image: assignment-service
+    environment:
+      WAIT_HOSTS: config-service:8888, registry-service:8761
+      WAIT_HOSTS_TIMEOUT: 900
+      WAIT_SLEEP_INTERVAL: 120
+      WAIT_HOST_CONNECT_TIMEOUT: 120
+      SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}}}'
+    depends_on:
+      - config-service
+      - postgres-assignment
+      - registry-service
+    command: sh -c "/wait"
+#    expose:
 #      - 8083
-#    networks:
-#      - spring-cloud-network
-#    logging:
-#      driver: json-file
-#    links:
-#      - config-service:config-service
-#      - postgres-assignment:postgres-assignment
+    ports:
+      - 8083
+    networks:
+      - spring-cloud-network
+    logging:
+      driver: json-file
+    links:
+      - config-service:config-service
+      - postgres-assignment:postgres-assignment
   subject-service:
-    container_name: subject-service  #TODO: need to be removed for scaling
+#    container_name: subject-service
     build:
       context: .
       dockerfile: subject-service/Dockerfile
     image: subject-service
     environment:
-      WAIT_HOSTS: config-service:8888
-      WAIT_HOSTS_TIMEOUT: 300
-      WAIT_SLEEP_INTERVAL: 60
-      WAIT_HOST_CONNECT_TIMEOUT: 60
+      WAIT_HOSTS: config-service:8888, registry-service:8761
+      WAIT_HOSTS_TIMEOUT: 900
+      WAIT_SLEEP_INTERVAL: 120
+      WAIT_HOST_CONNECT_TIMEOUT: 120
       SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}}}'
     depends_on:
       - config-service
       - postgres-subject
+      - registry-service
     command: sh -c "/wait"
 #    expose:
 #      - 8084
@@ -217,33 +214,33 @@ services:
     links:
       - config-service:config-service
       - postgres-subject:postgres-subject
-#  student-service:
+  student-service:
 #    container_name: student-service
-#    build:
-#      context: .
-#      dockerfile: student-service/Dockerfile
-#    image: student-service
-#    environment:
-#      WAIT_HOSTS: config-service:8888, registry-service:8761
-#      WAIT_HOSTS_TIMEOUT: 300
-#      WAIT_SLEEP_INTERVAL: 60
-#      WAIT_HOST_CONNECT_TIMEOUT: 60
-#      SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}}}'
-#    depends_on:
-#      - config-service
-#      - postgres-student
-#    command: sh -c "/wait"
-#    #    expose:
-#    #      - 8084
-#    ports:
-#      - 8085
-#    networks:
-#      - spring-cloud-network
-#    logging:
-#      driver: json-file
-#    links:
-#      - config-service:config-service
-#      - postgres-student:postgres-student
+    build:
+      context: .
+      dockerfile: student-service/Dockerfile
+    image: student-service
+    environment:
+      WAIT_HOSTS: config-service:8888, registry-service:8761
+      WAIT_HOSTS_TIMEOUT: 900
+      WAIT_SLEEP_INTERVAL: 120
+      WAIT_HOST_CONNECT_TIMEOUT: 120
+      SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}}}'
+    depends_on:
+      - config-service
+      - postgres-student
+      - registry-service
+    command: sh -c "/wait"
+    ports:
+      - 8085
+    networks:
+      - spring-cloud-network
+    logging:
+      driver: json-file
+    links:
+      - config-service:config-service
+      - registry-service:registry-service
+      - postgres-student:postgres-student
 
   registry-service:
     container_name: registry-service
@@ -253,9 +250,9 @@ services:
     image: registry-service
     environment:
       WAIT_HOSTS: config-service:8888
-      WAIT_HOSTS_TIMEOUT: 300
-      WAIT_SLEEP_INTERVAL: 60
-      WAIT_HOST_CONNECT_TIMEOUT: 60
+      WAIT_HOSTS_TIMEOUT: 600
+      WAIT_SLEEP_INTERVAL: 90
+      WAIT_HOST_CONNECT_TIMEOUT: 90
       SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}}}'
     command: sh -c "/wait"
     expose:
@@ -270,7 +267,7 @@ services:
       driver: json-file
     links:
       - config-service:config-service
-#    restart: on-failure
+    restart: on-failure
 
   gateway-service:
     container_name: gateway-service
@@ -280,9 +277,9 @@ services:
     image: gateway-service
     environment:
       WAIT_HOSTS: config-service:8888
-      WAIT_HOSTS_TIMEOUT: 300
-      WAIT_SLEEP_INTERVAL: 90
-      WAIT_HOST_CONNECT_TIMEOUT: 90
+      WAIT_HOSTS_TIMEOUT: 1200
+      WAIT_SLEEP_INTERVAL: 120
+      WAIT_HOST_CONNECT_TIMEOUT: 120
       SPRING_APPLICATION_JSON: '{"spring": {"cloud":{"config": {"uri": "http://config-service:8888"}}}}'
     command: sh -c "/wait"
     expose:
@@ -309,7 +306,6 @@ services:
 networks:
   spring-cloud-network:
     driver: bridge
-  monitoring:
 
 volumes:
   config-service-data:

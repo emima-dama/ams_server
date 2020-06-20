@@ -2,21 +2,3 @@ server:
   servlet:
     context-path: /subject
   port: ${PORT:0} #dynamic port
-
-#management:
-#  #  port: 9000
-#  security:
-#    enable: false
-#  endpoints:
-#    web:
-#      exposure:
-#        include: "*"
-#  endpoint:
-#    shutdown:
-#      enable: true
-#    metrics:
-#      enable: true
-#  metrics:
-#    export:
-#      influx:
-#        uri: "http://localhost:8186"

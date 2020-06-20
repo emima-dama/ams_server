@@ -13,5 +13,5 @@ import javax.validation.constraints.NotNull;
 public class AttendanceRequest {
 
     @NotNull
-    private Integer attendanceInfoId;
+    private String attendanceInfoCode;
 }

@@ -11,7 +11,7 @@ spring:
       password: amsConfigServerPassword #the password which apps will use to access its configurations
   flyway:
     enabled: false #disable flyway for config server
-  autoconfigure: #disable jpa repository for config server
+  autoconfigure: #disable jpa dao for config server
     exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration, \
       org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration, \
       org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration

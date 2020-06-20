@@ -2,13 +2,13 @@ spring:
   application:
     name: student-service
   datasource:
-    url: jdbc:postgresql://postgres-student:5432/student-db #localhost:5432/ams-student  #TODO: de modificat pt bd docker
+    url: jdbc:postgresql://postgres-student:5432/student-db
     username: student
     password: ams
     driver-class-name: org.postgresql.Driver
   cloud:
     config:
-      uri: http://localhost:8888 # where the config-server is running
+      uri: http://config-service:8888 # where the config-server is running
       fail-fast: true #the service will not run if it can't reach the config-service
       username: user #username of the config-service
       password: amsConfigServerPassword #password of the config-service
@@ -19,3 +19,27 @@ eureka:
   client:
     register-with-eureka: true #tells the built-in eureka client to not register itself with eureka, because we should act as a server
     fetch-registry: true
+
+
+management:
+  enable: false
+  endpoints:
+    web:
+      base-path: /attendance-actuator
+      exposure:
+        include: health, shutdown, prometheus, metrics
+  endpoint:
+    shutdown:
+      enable: true
+  #    health:
+  #      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    use-global-registry: false
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true   #Auto-configuration enables the instrumentation of all requests handled by Spring MVC

@@ -12,7 +12,7 @@ spring:
       password: amsConfigServerPassword #password of the config-service
   flyway:
     enabled: false #disable flyway for registry server
-  autoconfigure: #disable jpa repository for registry server
+  autoconfigure: #disable jpa dao for registry server
     exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration, \
       org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration, \
       org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
@@ -23,3 +23,5 @@ eureka:
   client:
     register-with-eureka: false #tells the built-in eureka client to not register itself with eureka, because we should act as a server
     fetch-registry: false
+
+

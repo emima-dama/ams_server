@@ -82,7 +82,7 @@ public class  AttendanceController {
         if (result.hasErrors())
             throw new AttendanceServiceException("Invalid attendance " + attendanceRequest, AttendanceExceptionType.INVALID_ATTENDANCE, HttpStatus.BAD_REQUEST);
 
-        logger.info("++++++ addAttendace with attendance info id : "+attendanceRequest.getAttendanceInfoId()+"++++++++++++++");
+        logger.info("++++++ addAttendace with attendance info id : "+attendanceRequest.getAttendanceInfoCode()+"++++++++++++++");
 
         AttendanceResponse attendanceResponse = service.addAttendance(attendanceRequest,principal.getName());
 
@@ -100,7 +100,7 @@ public class  AttendanceController {
         if (result.hasErrors())
             throw new AttendanceServiceException("Invalid attendance " + attendanceRequest, AttendanceExceptionType.INVALID_ATTENDANCE, HttpStatus.BAD_REQUEST);
 
-        logger.info("++++++ addAttendace with attendance info id : {}++++++++++++++",attendanceRequest.getAttendanceInfoId());
+        logger.info("++++++ addAttendace with attendance info id : {}++++++++++++++",attendanceRequest.getAttendanceInfoCode());
 
         AttendanceResponse attendanceResponse = service.addAttendance(attendanceRequest,studentId);
 

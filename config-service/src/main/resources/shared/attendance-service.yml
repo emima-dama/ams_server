@@ -3,20 +3,3 @@ server:
     context-path: /attendance
   port: ${PORT:0}
 
-#management:
-#  #  port: 9000
-#  security:
-#    enable: false
-#  endpoints:
-#    web:
-#      exposure:
-#        include: "*"
-#  endpoint:
-#    shutdown:
-#      enable: true
-#    metrics:
-#      enable: true
-#  metrics:
-#    export:
-#      influx:
-#        uri: "http://localhost:8186"
