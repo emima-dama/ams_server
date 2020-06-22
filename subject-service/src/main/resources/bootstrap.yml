@@ -19,3 +19,25 @@ eureka:
   client:
     register-with-eureka: true #tells the built-in eureka client to not register itself with eureka, because we should act as a server
     fetch-registry: true
+
+management:
+  security:
+    enable: false
+  endpoints:
+    web:
+      base-path: /subject-actuator
+      exposure:
+        include: health, shutdown, prometheus, metrics
+  endpoint:
+    shutdown:
+      enable: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    use-global-registry: false
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true   #Auto-configuration enables the instrumentation of all requests handled by Spring MVC

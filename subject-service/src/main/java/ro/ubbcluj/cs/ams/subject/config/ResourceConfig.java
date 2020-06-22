@@ -2,6 +2,7 @@ package ro.ubbcluj.cs.ams.subject.config;
 
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
@@ -13,7 +14,10 @@ public class ResourceConfig extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .anyRequest().permitAll();//.authenticated();
+                .antMatchers(HttpMethod.GET, "/teacher","/activities").hasAuthority("PROFESSOR")
+                .antMatchers(HttpMethod.GET, "/student").hasAuthority("STUDENT")
+                .antMatchers(HttpMethod.GET,"/subject/specialization**","/course-activity**").permitAll()
+                .anyRequest().authenticated();
     }
 
 }

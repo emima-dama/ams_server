@@ -22,10 +22,11 @@ eureka:
 
 
 management:
-  enable: false
+  security:
+    enable: false
   endpoints:
     web:
-      base-path: /attendance-actuator
+      base-path: /student-actuator
       exposure:
         include: health, shutdown, prometheus, metrics
   endpoint:

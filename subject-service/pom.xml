@@ -32,6 +32,13 @@
             <groupId>org.springframework.security.oauth.boot</groupId>
             <artifactId>spring-security-oauth2-autoconfigure</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>ro.ubbcluj.cs.ams</groupId>
+            <artifactId>utils</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <!--Metrics dependencies-->
         <dependency>
             <groupId>org.springframework.metrics</groupId>
@@ -60,7 +67,6 @@
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -103,7 +109,6 @@
                         <configuration>
                             <jdbc>
                                 <driver>org.postgresql.Driver</driver>
-                                <!--<url>jdbc:postgresql://postgres-subject:5432/subject-db</url>-->
                                 <url>jdbc:postgresql://localhost:5432/ams-subject2</url>
                                 <user>subject</user>
                                 <password>ams</password>

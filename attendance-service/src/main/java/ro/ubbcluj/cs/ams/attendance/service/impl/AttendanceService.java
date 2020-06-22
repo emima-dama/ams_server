@@ -24,6 +24,8 @@ import javax.inject.Provider;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @org.springframework.stereotype.Service
@@ -56,10 +58,12 @@ public class AttendanceService implements Service {
         AttendanceInfo attendanceInfo = new AttendanceInfo(Integer.parseInt("0"),attendanceInfoReq.getCourseId(),attendanceInfoReq.getActivityId(), username, createdAt,attendanceInfoReq.getRemainingTime(),barcode);
         Integer attendanceInfo_id = attendanceInfoDao.addAttendanceInfo(attendanceInfo);
 
-        return AttendanceInfoResponse.builder()
+
+        AttendanceInfoResponse attendanceInfoResponse = AttendanceInfoResponse.builder()
                 .barcode(barcode)
                 .createdAt(createdAt)
                 .build();
+        return attendanceInfoResponse;
 //        return null;
     }
 
@@ -90,6 +94,53 @@ public class AttendanceService implements Service {
                 .course(subjectResponseDto.getSubjectName())
                 .activity(subjectResponseDto.getActivityName())
                 .build();
+//        return null;
+    }
+
+    @Override
+    public AttendancesByTeacherResponseDto findAttendancesForStudentByTeacher(String studentId, String teacher) {
+
+        logger.info(">>>>>>>>>>>>>LOGGING findAttendancesForStudentByTeacher {} -- {}<<<<<<<<<<<<<<",studentId,teacher);
+
+        List<AttendanceRecord> attendanceRecordList = attendanceDao.findAllByStudent(studentId);
+        List<AttendanceByTeacherDto> attendanceByTeacherDtos = getAttendancesDto(attendanceRecordList);
+
+        logger.info(">>>>>>>>>>>>>SUCCESSFUL LOGGING findAttendancesForStudentByTeacher {}<<<<<<<<<<<<<<",attendanceByTeacherDtos.size());
+        return AttendancesByTeacherResponseDto.builder().attendances(attendanceByTeacherDtos).build();
+    }
+
+    @Override
+    public AttendancesByTeacherResponseDto findAttendancesByStudent(String student) {
+
+        logger.info(">>>>>>>>>>>>>LOGGING findAttendancesByStudent {}<<<<<<<<<<<<<<",student);
+
+        List<AttendanceRecord> attendanceRecordList = attendanceDao.findAllByStudent(student);
+        List<AttendanceByTeacherDto> attendances = getAttendancesDto(attendanceRecordList);
+
+        logger.info(">>>>>>>>>>>>>SUCCESSFUL LOGGING findAttendancesForStudentByTeacher {}<<<<<<<<<<<<<<",attendances.size());
+        return AttendancesByTeacherResponseDto.builder().attendances(attendances).build();
+    }
+
+    private List<AttendanceByTeacherDto> getAttendancesDto(List<AttendanceRecord> attendanceRecordList){
+
+        List<AttendanceByTeacherDto> attendanceByTeacherDtos = new ArrayList<>();
+        List<Integer> ids = new ArrayList<>();
+
+        for(AttendanceRecord ar: attendanceRecordList){
+            AttendanceInfoRecord attendanceInfoRecord = attendanceInfoDao.findById(ar.getAttendanceInfoId());
+            AttendanceByTeacherDto attendance = AttendanceByTeacherDto.builder()
+                    .id(ar.getAttendanceInfoId())
+                    .course(attendanceInfoRecord.getCourseId())
+                    .activity(attendanceInfoRecord.getActivityId())
+                    .professor(attendanceInfoRecord.getProfessorId())
+                    .date(ar.getCreatedAt().toString())
+                    .build();
+            if(!attendanceByTeacherDtos.contains(attendance) && !ids.contains(attendance.getId())){
+                attendanceByTeacherDtos.add(attendance);
+                ids.add(attendance.getId());
+            }
+        }
+        return attendanceByTeacherDtos;
     }
 
     private String generateBarcode() {

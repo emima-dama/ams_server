@@ -9,9 +9,3 @@ server:
   servlet:
     context-path: /assignment
   port: ${PORT:0} #dynamic port
-
-
-management:
-  endpoints:
-    web:
-      base-path: /assignment-actuator

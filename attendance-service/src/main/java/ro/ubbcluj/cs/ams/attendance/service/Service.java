@@ -1,13 +1,14 @@
 package ro.ubbcluj.cs.ams.attendance.service;
 
-import ro.ubbcluj.cs.ams.attendance.dto.AttendanceInfoReq;
-import ro.ubbcluj.cs.ams.attendance.dto.AttendanceInfoResponse;
-import ro.ubbcluj.cs.ams.attendance.dto.AttendanceRequest;
-import ro.ubbcluj.cs.ams.attendance.dto.AttendanceResponse;
+import ro.ubbcluj.cs.ams.attendance.dto.*;
 
 public interface Service {
 
     AttendanceInfoResponse addAttendanceInfo(AttendanceInfoReq attendanceInfoReq, String username);
 
-    AttendanceResponse addAttendance(AttendanceRequest attendanceRequest, String username);
+    AttendanceResponse addAttendance(AttendanceRequest attendanceRequest,String username);
+
+    AttendancesByTeacherResponseDto findAttendancesForStudentByTeacher(String studentId, String teacher);
+
+    AttendancesByTeacherResponseDto findAttendancesByStudent(String student);
 }

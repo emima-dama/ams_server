@@ -1,4 +1,4 @@
-package ro.ubbcluj.cs.ams.auth.repository;
+package ro.ubbcluj.cs.ams.auth.dao;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;

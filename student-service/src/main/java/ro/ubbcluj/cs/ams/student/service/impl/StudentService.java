@@ -6,14 +6,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import ro.ubbcluj.cs.ams.student.dao.enrollment.EnrollmentDao;
 import ro.ubbcluj.cs.ams.student.dao.group.GroupDao;
+import ro.ubbcluj.cs.ams.student.dao.student.StudentDao;
 import ro.ubbcluj.cs.ams.student.dto.*;
 import ro.ubbcluj.cs.ams.student.model.tables.pojos.Enrollment;
 import ro.ubbcluj.cs.ams.student.model.tables.pojos.GroupUniversity;
 import ro.ubbcluj.cs.ams.student.model.tables.records.EnrollmentRecord;
+import ro.ubbcluj.cs.ams.student.model.tables.records.GroupUniversityRecord;
 import ro.ubbcluj.cs.ams.student.service.Service;
 import ro.ubbcluj.cs.ams.student.service.exception.StudentExceptionType;
 import ro.ubbcluj.cs.ams.student.service.exception.StudentServiceException;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +29,12 @@ public class StudentService implements Service {
 
     @Autowired
     private EnrollmentDao enrollmentDao;
+
+    @Autowired
+    private GroupMapper groupMapper;
+
+    @Autowired
+    private StudentDao studentDao;
 
     private final Logger logger = LogManager.getLogger(StudentService.class);
 
@@ -69,8 +78,8 @@ public class StudentService implements Service {
         List<String> students = enrollmentDao.getStundentsBySubject(subjectId);
 
         StudentsBySubjectsResponseDto studentsReponse = StudentsBySubjectsResponseDto.builder()
-                                                    .usernames(new ArrayList<>(new HashSet<>(students))) //without duplicates
-                                                    .build();
+                .usernames(new ArrayList<>(new HashSet<>(students))) //without duplicates
+                .build();
         logger.info(" ============ SUCCESSFUL LOGGING getStudentsBySubjects with size {} ============",studentsReponse.getUsernames().size());
         return studentsReponse;
     }
@@ -87,6 +96,48 @@ public class StudentService implements Service {
                 .build();
         logger.info(" ============ SUCCESSFUL LOGGING findSubjectsByStudent with size {} ============",subjectsByStudentDto.getSubjectsIds().size());
         return subjectsByStudentDto;
+    }
+
+    @Override
+    public GroupNameResponseDto findGroupByStudent(Principal studentId) {
+
+        logger.info(">>>>>>>>>> LOGGING findGroupByStudent <<<<<<<<<<<<<<<<");
+
+        GroupUniversityRecord groupUniversityRecord = groupDao.findOneByStudent(studentId.getName());
+        String groupName = groupUniversityRecord.getName();
+
+        logger.info(">>>>>>>>> SUCCESSFUL LOGGING findGroupByStudent {}<<<<<<<<<<<<<<<<", groupName);
+        return GroupNameResponseDto.builder()
+                .name(groupName).build();
+    }
+
+    @Override
+    public GroupsResponseDto getAllGroups() {
+
+        logger.info(">>>>>>>>>> LOGGING getAllGroups <<<<<<<<<<<<<<<<");
+
+        List<GroupUniversityRecord> groups = groupDao.findAll();
+
+        logger.info(">>>>>>>>> SUCCESSFUL LOGGING getAllGroups <<<<<<<<<<<<<<<<");
+        return GroupsResponseDto.builder()
+                .groups(groupMapper.groupUniversityRecordsToGroupUniversities(groups))
+                .build();
+
+    }
+
+    @Override
+    public StudentsByGroupResponseDto findStudentsByGroup(Integer groupId) {
+
+        logger.info(">>>>>>>>>> LOGGING findStudentsByGroup <<<<<<<<<<<<<<<<");
+
+        List<String> students = studentDao.findStudentsByGroup(groupId);
+
+        logger.info(">>>>>>>>> SUCCESSFUL LOGGING findStudentsByGroup <<<<<<<<<<<<<<<<");
+        return StudentsByGroupResponseDto
+                .builder()
+                .usernames(students)
+                .build();
+
     }
 
     GroupUniversity converetToGroupUniveristyPojo(GroupRequestDto groupRequestDto){

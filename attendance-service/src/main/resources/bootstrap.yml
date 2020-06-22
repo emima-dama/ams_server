@@ -1,6 +1,6 @@
 spring:
   application:
-    name: attendance-service
+    name: attendance-server
   datasource:
     url: jdbc:postgresql://postgres-attendance:5432/attendance-db
     username: attendance
@@ -20,9 +20,8 @@ eureka:
     register-with-eureka: true #tells the built-in eureka client to not register itself with eureka, because we should act as a server
     fetch-registry: true
 
-separator.barcode : "--"
-
 management:
+  security:
     enable: false
   endpoints:
     web:
@@ -32,8 +31,6 @@ management:
   endpoint:
     shutdown:
       enable: true
-  #    health:
-  #      show-details: always
   metrics:
     export:
       prometheus:
@@ -44,12 +41,3 @@ management:
         request:
           autotime:
             enabled: true   #Auto-configuration enables the instrumentation of all requests handled by Spring MVC
-    distribution:
-      percentiles-histogram:
-        http:
-          server:
-            requests: true
-      sla:
-        http:
-          server:
-            requests: 100ms,150ms,250ms,500ms,1s

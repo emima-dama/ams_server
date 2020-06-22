@@ -27,7 +27,7 @@ public class MicroserviceCall {
     public SubjectResponseDto getSubjectActivityNames(String subjectId,Integer activityId){
 
         logger.info(" >>>>>>>>>>> LOGGING getSubjectActivityNames with subject id {} and activity id {}",subjectId,activityId);
-        logger.info("\nCall subject microservice <<<<<<<<<<< ");
+        logger.info("Call subject microservice <<<<<<<<<<< ");
         SubjectResponseDto info = null;
         try {
             String path = "http://subject-service/subject/course-activity?courseId=" + subjectId+"&activityId="+activityId;

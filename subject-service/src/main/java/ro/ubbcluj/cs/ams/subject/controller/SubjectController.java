@@ -1,8 +1,5 @@
 package ro.ubbcluj.cs.ams.subject.controller;
 
-import io.micrometer.core.annotation.Timed;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -13,7 +10,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ro.ubbcluj.cs.ams.subject.dto.*;
@@ -27,7 +23,6 @@ import javax.validation.Valid;
 import java.security.Principal;
 
 @RestController
-@Timed
 public class SubjectController {
 
     private final Logger logger = LogManager.getLogger(SubjectController.class);
@@ -35,22 +30,8 @@ public class SubjectController {
     @Autowired
     private Service service;
 
-    private final Counter counter;
-
-    public SubjectController(MeterRegistry registry) {
-
-        this.counter = registry.counter("subject.messages","type","requests");
-
-    }
-
-    @Scheduled(fixedRate = 5000)
-    @Timed(description = "Time spent serving requests")
-    public void verifyNrOfReq() throws InterruptedException {
-        if (counter.count() > 2.0) {
-            logger.info("!!!!Needs to create another instance!!!!!");
-            Thread.sleep(1000);
-        }
-    }
+    @Autowired
+    private MicroserviceCall microserviceCall;
 
     /**
      * URL : http://localhost:8080/subject/
@@ -132,6 +113,29 @@ public class SubjectController {
         return new ResponseEntity<>(subjectsResponseDto, HttpStatus.OK);
     }
 
+    //TODO: apel catre student-service
+    @ApiOperation(value = "Get SPLink by student username")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "SUCCESS", response = SpLinkResponseDto.class),
+            @ApiResponse(code = 404, message = "NOT FOUND", response = SubjectExceptionType.class)
+    })
+    @RequestMapping(value = "/student", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SubjectsResponseDto> findSubjectByStudent(Principal principal) {
+
+        logger.info("========== LOGGING findSubjectByStudent ==========");
+
+        String studentId = principal.getName();
+        //TODO : verify if username exists
+        SubjectsByStudentDto subjectsByStudent = microserviceCall.getSubjectsIdsByStudentId(studentId);
+        SubjectsResponseDto subjectsResponseDto = service.findSubjectsByStudent(studentId,subjectsByStudent);
+
+        if (subjectsResponseDto.getSubjects().isEmpty())
+            throw new SubjectServiceException("The student "+studentId+" doesn't have any subjects", SubjectExceptionType.SUBJECT_NOT_FOUND, HttpStatus.NOT_FOUND);
+
+        logger.info("========== SUCCESSFUL LOGGING findSubjectByStudent ==========");
+        return new ResponseEntity<>(subjectsResponseDto, HttpStatus.OK);
+    }
+
     @ApiOperation(value ="Get specialization by id")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "SUCCESS", response = Specialization.class),
@@ -163,9 +167,27 @@ public class SubjectController {
             throw new SubjectServiceException("Subject not found", SubjectExceptionType.SUBJECT_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
 
-        logger.info("========== SUCCESSFUL LOGGING findSubject =========");
+        logger.info("========== SUCCESSFUL LOGGING findSubjectById =========");
         return new ResponseEntity<>(subjectResponseDto,HttpStatus.OK);
     }
+
+    @ApiOperation(value = "Find subject name and activity name by ids")
+    @RequestMapping(value = "/course/activity", method = RequestMethod.GET, params = {"courseId","activityId"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SubjectActivityResponseDto> findSubjectActivityByIds(@RequestParam(name = "courseId") String courseId,@RequestParam(name = "activityId") Integer activityId){
+
+        logger.info(" >>>>>>>>>> LOGGING findSubjectActivityByIds <<<<<<<<<<<<");
+        logger.info("Subject id {}",courseId);
+        logger.info("Activity id {}",activityId);
+
+        SubjectActivityResponseDto subjectActivityByIds = service.findSubjectActivityByIds(courseId,activityId);
+        if(subjectActivityByIds == null){
+            throw new SubjectServiceException("Subject or Activity not found", SubjectExceptionType.SUBJECT_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+
+        logger.info(">>>>>>>>>> SUCCESSFUL LOGGING findSubjectActivityByIds <<<<<<<<<<<<");
+        return new ResponseEntity<>(subjectActivityByIds,HttpStatus.OK);
+    }
+
 
     private void loggingSubject(SubjectRequestDto subject) {
 
@@ -177,8 +199,8 @@ public class SubjectController {
 
     @ExceptionHandler({SubjectServiceException.class})
     @ResponseBody
-    public ResponseEntity<SubjectExceptionType> handleException(SubjectServiceException exception) {
+    public ResponseEntity<String> handleException(SubjectServiceException exception) {
 
-        return new ResponseEntity<>(exception.getType(), new HttpHeaders(), exception.getHttpStatus());
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), exception.getHttpStatus());
     }
 }

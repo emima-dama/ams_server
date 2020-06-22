@@ -6,6 +6,8 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ro.ubbcluj.cs.ams.attendance.config.ResourceConfig;
+import ro.ubbcluj.cs.ams.attendance.dao.attendanceInfoDao.AttendanceInfoDao;
 import ro.ubbcluj.cs.ams.attendance.dao.attendanceInfoDao.AttendanceInfoDao;
 import ro.ubbcluj.cs.ams.attendance.model.Tables;
 import ro.ubbcluj.cs.ams.attendance.model.tables.pojos.Attendance;
@@ -25,14 +27,14 @@ public class AttendanceInfoDaoImpl implements AttendanceInfoDao {
     @Override
     public Integer addAttendanceInfo(AttendanceInfo attendanceInfo) {
 
-        logger.info(">>>>>>>>>>>> Before insert action for attendance info {} <<<<<<<<<<<",attendanceInfo.toString());
+        logger.info("++++++++ Before insert action for attendance info "+attendanceInfo.toString()+" +++++++++++");
 
-        Record1<Integer> attendance_info_id = dsl.insertInto(Tables.ATTENDANCE_INFO,Tables.ATTENDANCE_INFO.COURSE_ID,Tables.ATTENDANCE_INFO.ACTIVITY_ID,Tables.ATTENDANCE_INFO.PROFESSOR_ID,Tables.ATTENDANCE_INFO.CREATED_AT,Tables.ATTENDANCE_INFO.REMAINING_TIME)
-                    .values(attendanceInfo.getCourseId(),attendanceInfo.getActivityId(),attendanceInfo.getProfessorId(),attendanceInfo.getCreatedAt(),attendanceInfo.getRemainingTime())
-                    .returningResult(Tables.ATTENDANCE_INFO.ID)
-                    .fetchOne();
+        Record1<Integer> attendance_info_id = dsl.insertInto(Tables.ATTENDANCE_INFO,Tables.ATTENDANCE_INFO.COURSE_ID,Tables.ATTENDANCE_INFO.ACTIVITY_ID,Tables.ATTENDANCE_INFO.PROFESSOR_ID,Tables.ATTENDANCE_INFO.CREATED_AT,Tables.ATTENDANCE_INFO.REMAINING_TIME,Tables.ATTENDANCE_INFO.CODE)
+                .values(attendanceInfo.getCourseId(),attendanceInfo.getActivityId(),attendanceInfo.getProfessorId(),attendanceInfo.getCreatedAt(),attendanceInfo.getRemainingTime(),attendanceInfo.getCode())
+                .returningResult(Tables.ATTENDANCE_INFO.ID)
+                .fetchOne();
 
-        logger.info(">>>>>>>>> Id of attendance_info object is : {} <<<<<<<<<<<<< ",attendance_info_id);
+        logger.info("+++++++ Id of attendance_info object is : "+attendance_info_id+" ++++++++");
 
         if(attendance_info_id == null)
             return null;
@@ -42,10 +44,22 @@ public class AttendanceInfoDaoImpl implements AttendanceInfoDao {
     @Override
     public AttendanceInfoRecord findByCode(String code) {
 
-        logger.info(">>>>>>>>>>>> Before search for attendance info by code : {} <<<<<<<<<<<" ,code);
+        logger.info("++++++++ Before search for attendance info by code : {} +++++++++++" ,code);
 
-        return dsl.selectFrom(Tables.ATTENDANCE_INFO)
+        AttendanceInfoRecord attendanceInfoRecord = dsl.selectFrom(Tables.ATTENDANCE_INFO)
                 .where(Tables.ATTENDANCE_INFO.CODE.eq(code))
                 .fetchAny();
+        return attendanceInfoRecord;
+    }
+
+    @Override
+    public AttendanceInfoRecord findById(Integer id) {
+
+        logger.info(">>>>>>>>>> Before search for attendance info by id : {} <<<<<<<<" ,id);
+
+        AttendanceInfoRecord attendanceInfoRecord = dsl.selectFrom(Tables.ATTENDANCE_INFO)
+                .where(Tables.ATTENDANCE_INFO.ID.eq(id))
+                .fetchOne();
+        return attendanceInfoRecord;
     }
 }

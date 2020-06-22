@@ -20,6 +20,7 @@ import ro.ubbcluj.cs.ams.student.service.exception.StudentExceptionType;
 import ro.ubbcluj.cs.ams.student.service.exception.StudentServiceException;
 
 import javax.validation.Valid;
+import java.security.Principal;
 
 @RestController
 public class StudentController {
@@ -43,7 +44,7 @@ public class StudentController {
     @RequestMapping(value = "/group", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GroupResponseDto> addGroup(@Valid @RequestBody GroupRequestDto groupDto, BindingResult result) {
 
-        logger.info("========= LOGGING addGroup ============ ");
+        logger.info(">>>>>>>>>>> LOGGING addGroup <<<<<<<<<<<<<<<");
         loggingGroupRequestDto(groupDto);
 
         if (result.hasErrors())
@@ -52,7 +53,7 @@ public class StudentController {
         microserviceCall.checkIfExistsASpecialization(groupDto.getSpecId());
         GroupResponseDto savedGroup = service.addGroup(groupDto);
         logger.info("Saved group id: {}", savedGroup.getIdGroup());
-        logger.info(" =========== SUCCESSFUL LOGGING addGroup ==============");
+        logger.info(">>>>>>>>>>>> SUCCESSFUL LOGGING addGroup <<<<<<<<<<<<<<<");
         return new ResponseEntity<>(savedGroup, HttpStatus.OK);
     }
 
@@ -68,7 +69,7 @@ public class StudentController {
     @RequestMapping(value = "/enrollment", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> addEnrollment(@Valid @RequestBody EnrollmentRequestDto enrollmentRequestDto, BindingResult result){//}), Principal principal) {
 
-        logger.info(" ============ LOGGING addEnrollment =============");
+        logger.info(">>>>>>>>>>>> LOGGING addEnrollment <<<<<<<<<<<<<<<");
         logger.info("Student: {}", enrollmentRequestDto.getStudentUsername());
         logger.info("Subject: {}", enrollmentRequestDto.getSubjectId());
 
@@ -80,11 +81,11 @@ public class StudentController {
         boolean response = service.addEnrollment(enrollmentRequestDto);
 
         if(!response){
-            logger.info("=========== ERROR addEnrollment ==========");
+            logger.info(">>>>>>>>>>>> ERROR addEnrollment <<<<<<<<<<<<<<<");
             return new ResponseEntity<>("Cannot add enrollment for student "+enrollmentRequestDto.getStudentUsername()+" at subject " +enrollmentRequestDto.getSubjectId()+" !!!!!",HttpStatus.BAD_REQUEST);
         }
 
-        logger.info("============== SUCCESSFUL LOGGING addEnrollment ============");
+        logger.info(">>>>>>>>>>>> SUCCESSFUL LOGGING addEnrollment <<<<<<<<<<<<<<<");
         return new ResponseEntity<>("Add enrollment with SUCCESS :)", HttpStatus.OK);
     }
 
@@ -96,17 +97,36 @@ public class StudentController {
     @RequestMapping(value = "/students", method = RequestMethod.GET, params = {"subjectId"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StudentsBySubjectsResponseDto> getStudentsBySubjects(@RequestParam(name = "subjectId") String subjectId){
 
-        logger.info("========== LOGGING getStudentBySubjects ============");
+        logger.info(">>>>>>>>>>>> LOGGING getStudentBySubjects <<<<<<<<<<<<<<<");
         logger.info("Subject id : {} ",subjectId);
-//        if (result.hasErrors())
-//            throw new StudentServiceException("Subjects ids can not be empty", StudentExceptionType.ERROR, HttpStatus.BAD_REQUEST);
 
         StudentsBySubjectsResponseDto students = service.getStudentsBySubjects(subjectId);
 
         if(students == null)
             throw new StudentServiceException("The response is null !", StudentExceptionType.ERROR, HttpStatus.BAD_REQUEST);
 
-        logger.info("========== SUCCESSFUL LOGGING getStudentsBySubjects =============");
+        logger.info(">>>>>>>>>>>> SUCCESSFUL LOGGING getStudentsBySubjects <<<<<<<<<<<<<<<");
+        return new ResponseEntity<>(students,HttpStatus.OK);
+
+    }
+
+    @ApiOperation(value = "Get students by group")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "SUCCESS", response = Enrollment.class),
+            @ApiResponse(code = 502, message = "ERROR", response = StudentExceptionType.class)
+    })
+    @RequestMapping(value = "/group", method = RequestMethod.GET, params = {"groupId"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<StudentsByGroupResponseDto> getStudentsByGroup(@RequestParam(name = "groupId") Integer groupId){
+
+        logger.info(">>>>>>>>>>>> LOGGING getStudentsByGroup <<<<<<<<<<<<<<<");
+        logger.info("Group id : {} ",groupId);
+
+        StudentsByGroupResponseDto students = service.findStudentsByGroup(groupId);
+
+        if(students == null)
+            throw new StudentServiceException("The response is null !", StudentExceptionType.ERROR, HttpStatus.BAD_REQUEST);
+
+        logger.info(">>>>>>>>>>>> SUCCESSFUL LOGGING getStudentsByGroup <<<<<<<<<<<<<<<");
         return new ResponseEntity<>(students,HttpStatus.OK);
 
     }
@@ -128,6 +148,42 @@ public class StudentController {
 
         logger.info("========== SUCCESSFUL LOGGING findSubjectByStudent ==========");
         return new ResponseEntity<>(subjectsByStudentDto, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Get group by student username")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "SUCCESS", response = StudentExceptionType.class),
+            @ApiResponse(code = 404, message = "NOT FOUND", response = StudentExceptionType.class)
+    })
+    @RequestMapping(value = "/group", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GroupNameResponseDto> findGroupByStudent(Principal studentId) {
+
+        logger.info(">>>>>>>>>> LOGGING findGroupByStudent <<<<<<<<<<<<<<<<");
+
+        GroupNameResponseDto groupNameResponseDto = service.findGroupByStudent(studentId);
+        if (groupNameResponseDto == null)
+            throw new StudentServiceException("There is no one group for student "+studentId, StudentExceptionType.GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+
+        logger.info(">>>>>>>>> SUCCESSFUL LOGGING findGroupByStudent {} <<<<<<<<<<<<<<<<",groupNameResponseDto.getName());
+        return new ResponseEntity<>(groupNameResponseDto, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Get all groups")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "SUCCESS", response = StudentExceptionType.class),
+            @ApiResponse(code = 404, message = "NOT FOUND", response = StudentExceptionType.class)
+    })
+    @RequestMapping(value = "/groups", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GroupsResponseDto> getAllGroups() {
+
+        logger.info(">>>>>>>>>> LOGGING getAllGroups <<<<<<<<<<<<<<<<");
+
+        GroupsResponseDto groupsResponseDto = service.getAllGroups();
+        if (groupsResponseDto == null)
+            throw new StudentServiceException("There is no one groups ", StudentExceptionType.GROUP_NOT_FOUND, HttpStatus.NOT_FOUND);
+
+        logger.info(">>>>>>>>> SUCCESSFUL LOGGING getAllGroups with size {} <<<<<<<<<<<<<<<<",groupsResponseDto.getGroups().size());
+        return new ResponseEntity<>(groupsResponseDto, HttpStatus.OK);
     }
 
     private void loggingGroupRequestDto(GroupRequestDto groupDto) {

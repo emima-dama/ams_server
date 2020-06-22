@@ -15,4 +15,8 @@ public interface Service {
     SubjectResponseDto findSubjectById(String id);
 
     ActivitiesResponseDto findActivitiesByTeacher(String name);
+
+    SubjectsResponseDto findSubjectsByStudent(String studentId,SubjectsByStudentDto subjectsByStudent);
+
+    SubjectActivityResponseDto findSubjectActivityByIds(String courseId, Integer activityId);
 }

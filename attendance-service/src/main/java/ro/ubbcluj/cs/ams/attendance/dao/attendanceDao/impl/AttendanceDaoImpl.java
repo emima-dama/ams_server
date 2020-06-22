@@ -11,6 +11,8 @@ import ro.ubbcluj.cs.ams.attendance.model.Tables;
 import ro.ubbcluj.cs.ams.attendance.model.tables.pojos.Attendance;
 import ro.ubbcluj.cs.ams.attendance.model.tables.records.AttendanceRecord;
 
+import java.util.List;
+
 
 @Component
 public class AttendanceDaoImpl implements AttendanceDao {
@@ -26,11 +28,24 @@ public class AttendanceDaoImpl implements AttendanceDao {
         logger.info("+++++++++++ Before addAttendance :"+attendance+"++++++++++++++++");
 
         AttendanceRecord attendanceRecord = dsl.insertInto(Tables.ATTENDANCE,Tables.ATTENDANCE.STUDENT_ID,Tables.ATTENDANCE.CREATED_AT,Tables.ATTENDANCE.ATTENDANCE_INFO_ID)
-                                        .values(attendance.getStudentId(),attendance.getCreatedAt(),attendance.getAttendanceInfoId())
-                                        .returning()
-                                        .fetchOne();
+                .values(attendance.getStudentId(),attendance.getCreatedAt(),attendance.getAttendanceInfoId())
+                .returning()
+                .fetchOne();
 
         logger.info("+++++ After add action ++++++++++");
         return attendanceRecord;
+    }
+
+    @Override
+    public List<AttendanceRecord> findAllByStudent(String student) {
+
+        logger.info(">>>>>>>>>>>>>LOGGING findAllByStudent {}<<<<<<<<<<<<<<",student);
+
+        List<AttendanceRecord> attendances = dsl.selectFrom(Tables.ATTENDANCE)
+                .where(Tables.ATTENDANCE.STUDENT_ID.eq(student))
+                .fetch();
+
+        logger.info(">>>>>>>>>>>>>SUCCESSFUL LOGGING findAllByStudent {}<<<<<<<<<<<<<<",attendances.size());
+        return attendances;
     }
 }
