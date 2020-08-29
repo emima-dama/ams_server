@@ -27,7 +27,7 @@ management:
     web:
       base-path: /subject-actuator
       exposure:
-        include: health, shutdown, prometheus, metrics
+        include: prometheus, metrics
   endpoint:
     shutdown:
       enable: true

@@ -4,12 +4,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import ro.ubbcluj.cs.ams.assignment.dao.AssignmentRepo;
 import ro.ubbcluj.cs.ams.assignment.dto.GradeDto;
-import ro.ubbcluj.cs.ams.assignment.dto.*;
+import ro.ubbcluj.cs.ams.assignment.dto.GradeMapper;
 import ro.ubbcluj.cs.ams.assignment.dto.GradeResponseDto;
+import ro.ubbcluj.cs.ams.assignment.dto.GradesResponseDto;
 import ro.ubbcluj.cs.ams.assignment.model.tables.pojos.Grade;
 import ro.ubbcluj.cs.ams.assignment.model.tables.records.GradeRecord;
+import ro.ubbcluj.cs.ams.assignment.dao.AssignmentRepo;
 import ro.ubbcluj.cs.ams.assignment.service.Service;
 import ro.ubbcluj.cs.ams.assignment.service.exception.AssignmentServiceException;
 import ro.ubbcluj.cs.ams.assignment.service.exception.AssignmentServiceExceptionType;
@@ -58,9 +59,25 @@ public class AssignmentService implements Service {
             throw new AssignmentServiceException("Connection with db failed or there is no grades", AssignmentServiceExceptionType.ERROR, HttpStatus.NOT_FOUND);
         }
 
-        logger.info(">>>>>>>>>>>>>>>> SUCCESSFUL LOGGING addGrade <<<<<<<<<<<<<");
+        logger.info(">>>>>>>>>>>>>>>> SUCCESSFUL LOGGING findGradesByStudent <<<<<<<<<<<<<");
         return GradesResponseDto.builder()
 //                .grades(gradeRecords)
+                .grades(gradeMapper.gradeRecordstoGradeResponseDtos(gradeRecords))
+                .build();
+    }
+
+    @Override
+    public GradesResponseDto findGradesBySubject(String subject, String name) {
+
+        logger.info(">>>>>>>>>>>>>>>> LOGGING findGradesBySubject <<<<<<<<<<<<<");
+
+        List<GradeRecord> gradeRecords = assignmentRepo.findAllByStudentAndSubject(name,subject);
+        if (gradeRecords == null){
+            throw new AssignmentServiceException("Connection with db failed or there is no grades", AssignmentServiceExceptionType.ERROR, HttpStatus.NOT_FOUND);
+        }
+
+        logger.info(">>>>>>>>>>>>>>>> SUCCESSFUL LOGGING findGradesBySubject <<<<<<<<<<<<<");
+        return GradesResponseDto.builder()
                 .grades(gradeMapper.gradeRecordstoGradeResponseDtos(gradeRecords))
                 .build();
     }

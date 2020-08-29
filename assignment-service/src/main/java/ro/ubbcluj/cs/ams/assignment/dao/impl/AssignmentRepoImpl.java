@@ -45,4 +45,16 @@ public class AssignmentRepoImpl implements AssignmentRepo {
         logger.info(">>>>>>>>>>>>>>>> findAllByStudent successful <<<<<<<<<<<<<");
         return gradeRecord;
     }
+
+    @Override
+    public List<GradeRecord> findAllByStudentAndSubject(String name, String subject) {
+
+        logger.info(">>>>>>>>>>>>>>>> Before findAllByStudent <<<<<<<<<<<<<");
+
+        List<GradeRecord> gradeRecord = dsl.selectFrom(Tables.GRADE)
+                .where(Tables.GRADE.STUDENT.eq(name),Tables.GRADE.SUBJECT_ID.eq(subject))
+                .fetch();
+        logger.info(">>>>>>>>>>>>>>>> findAllByStudent successful <<<<<<<<<<<<<");
+        return gradeRecord;
+    }
 }

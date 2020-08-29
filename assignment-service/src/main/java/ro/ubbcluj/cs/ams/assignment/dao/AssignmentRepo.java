@@ -10,4 +10,6 @@ public interface AssignmentRepo {
     GradeRecord addGrade(Grade grade);
 
     List<GradeRecord> findAllByStudent(String student);
+
+    List<GradeRecord> findAllByStudentAndSubject(String name, String subject);
 }

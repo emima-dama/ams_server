@@ -10,7 +10,6 @@
         <module name="config-service" />
         <module name="gateway-service" />
         <module name="registry-service" />
-        <module name="utils" />
       </profile>
       <profile name="Annotation profile for ro.ubbcluj.cs.ams-server" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />

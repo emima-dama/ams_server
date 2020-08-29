@@ -33,10 +33,6 @@
             <groupId>org.springframework.security.oauth.boot</groupId>
             <artifactId>spring-security-oauth2-autoconfigure</artifactId>
         </dependency>
-        <!--        <dependency> &lt;!&ndash;security config class must exist for this dependency&ndash;&gt;-->
-        <!--            <groupId>org.springframework.security</groupId>-->
-        <!--            <artifactId>spring-security-config</artifactId>-->
-        <!--        </dependency>-->
     </dependencies>
 
     <build>

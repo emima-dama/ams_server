@@ -1,4 +1,4 @@
-package ro.ubbcluj.cs.ams.utils;
+package ro.ubbcluj.cs.ams.student.config;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;

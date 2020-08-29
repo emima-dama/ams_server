@@ -125,7 +125,7 @@ public class SubjectController {
         logger.info("========== LOGGING findSubjectByStudent ==========");
 
         String studentId = principal.getName();
-        //TODO : verify if username exists
+
         SubjectsByStudentDto subjectsByStudent = microserviceCall.getSubjectsIdsByStudentId(studentId);
         SubjectsResponseDto subjectsResponseDto = service.findSubjectsByStudent(studentId,subjectsByStudent);
 
@@ -172,7 +172,7 @@ public class SubjectController {
     }
 
     @ApiOperation(value = "Find subject name and activity name by ids")
-    @RequestMapping(value = "/course/activity", method = RequestMethod.GET, params = {"courseId","activityId"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/course-activity", method = RequestMethod.GET, params = {"courseId","activityId"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SubjectActivityResponseDto> findSubjectActivityByIds(@RequestParam(name = "courseId") String courseId,@RequestParam(name = "activityId") Integer activityId){
 
         logger.info(" >>>>>>>>>> LOGGING findSubjectActivityByIds <<<<<<<<<<<<");

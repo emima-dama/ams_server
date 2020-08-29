@@ -1,4 +1,4 @@
-package ro.ubbcluj.cs.ams.utils;
+package ro.ubbcluj.cs.ams.student.config;
 
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;

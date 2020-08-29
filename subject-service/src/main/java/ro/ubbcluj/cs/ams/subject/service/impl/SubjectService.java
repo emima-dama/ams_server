@@ -133,7 +133,7 @@ public class SubjectService implements Service {
     @Override
     public ActivitiesResponseDto findActivitiesByTeacher(String name) {
 
-        logger.info(">>>>>>>>>> LOGGING findActivitiesByTeacher {}<<<<<<<",name);
+        logger.info("========== LOGGING findActivitiesByTeacher ==========");
         List<SpLinkRecord> spLinkRecords = spLinkDao.findSpLinkByUser(name);
         List<ActivityTypeRecord> activityTypeRecords = new ArrayList<>();
 
@@ -161,7 +161,8 @@ public class SubjectService implements Service {
 
         for(String id: subjects){
             SubjectRecord currentSubject = subjectDao.findById(id);
-            subjectRecords.add(currentSubject);
+            if(!subjectRecords.contains(currentSubject))
+                subjectRecords.add(currentSubject);
         }
         logger.info("========== SUCCESSFUL LOGGING findSubjectsByStudent with size {} ================",subjectRecords.size());
 

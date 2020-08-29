@@ -137,7 +137,7 @@ services:
     build:
       context: .
       dockerfile: attendance-service/Dockerfile
-    image: attendance-service
+    image: attendance-img
     environment:
       WAIT_HOSTS: config-service:8888, registry-service:8761
       WAIT_HOSTS_TIMEOUT: 1800
@@ -188,6 +188,7 @@ services:
     links:
       - config-service:config-service
       - postgres-assignment:postgres-assignment
+#    restart: on-failure
 
   subject-service:
 #    container_name: subject-service
@@ -217,13 +218,14 @@ services:
     links:
       - config-service:config-service
       - postgres-subject:postgres-subject
+#    restart: on-failure
 
   student-service:
 #    container_name: student-service
     build:
       context: .
       dockerfile: student-service/Dockerfile
-    image: student-service
+    image: student-img
     environment:
       WAIT_HOSTS: config-service:8888, registry-service:8761
       WAIT_HOSTS_TIMEOUT: 1800
@@ -245,6 +247,7 @@ services:
       - config-service:config-service
       - registry-service:registry-service
       - postgres-student:postgres-student
+
 
   registry-service:
     container_name: registry-service

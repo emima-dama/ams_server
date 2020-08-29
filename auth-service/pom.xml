@@ -34,12 +34,6 @@
             <groupId>org.springframework.security.oauth.boot</groupId>
             <artifactId>spring-security-oauth2-autoconfigure</artifactId>
         </dependency>
-        <dependency>
-            <groupId>ro.ubbcluj.cs.ams</groupId>
-            <artifactId>utils</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
 
         <!--Metrics dependencies-->
         <dependency>

@@ -19,7 +19,7 @@ import java.util.Objects;
 @Component
 public class MicroserviceCall {
 
-    @Qualifier
+    @Autowired
     private WebClient.Builder webClientBuilder;
 
     private final Logger logger = LogManager.getLogger(MicroserviceCall.class);

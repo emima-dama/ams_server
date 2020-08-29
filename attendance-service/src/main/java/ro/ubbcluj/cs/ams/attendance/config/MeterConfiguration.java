@@ -11,15 +11,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MeterConfiguration {
 
-//    @Autowired
-//    Environment environment;
-//
-//    String port = environment.getProperty("local.server.port");
-
     @Bean
     MeterRegistryCustomizer<MeterRegistry> metricsCommonTags() {
 
-        //return registry -> registry.config().namingConvention(MY_CUSTOM_CONVENTION);
         return registry -> registry.config().commonTags("appName","attendance-service").commonTags("namespace", "attendance").commonTags("pod", "localhost:8080") ;
     }
 

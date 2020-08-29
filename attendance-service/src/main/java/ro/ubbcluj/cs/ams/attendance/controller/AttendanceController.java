@@ -37,7 +37,6 @@ public class  AttendanceController {
     private Logger logger = LogManager.getLogger(AttendanceController.class);
 
     private final Counter counterBasic;
-    //    private final Counter counterFluentApi;
     private MeterRegistry meterRegistry;
 
 
@@ -45,13 +44,6 @@ public class  AttendanceController {
 
         this.meterRegistry = registry;
         this.counterBasic = registry.counter("attendance.messages","type","requests");
-//        Gauge.builder("beer.ordersInQueue",)
-//                .description("Number of unserved orders")
-//                .register(meterRegistry);
-//        this.counterFluentApi = Counter.builder("attendance.messages")    // 2 - create a counter using the fluent API
-//                .tag("type", "fluentApi")
-//                .description("The number of requests for attendance service")
-//                .register(meterRegistry);
 
     }
 
@@ -111,7 +103,7 @@ public class  AttendanceController {
         if (result.hasErrors())
             throw new AttendanceServiceException("Invalid attendance " + attendanceRequest, AttendanceExceptionType.INVALID_ATTENDANCE, HttpStatus.BAD_REQUEST);
 
-        logger.info("++++++ addAttendace with attendance info id : {}++++++++++++++",attendanceRequest.getAttendanceInfoCode());
+        logger.info(">>>>>>> addAttendace with attendance info id : {}<<<<<<<<<<<<",attendanceRequest.getAttendanceInfoCode());
 
         AttendanceResponse attendanceResponse = service.addAttendance(attendanceRequest,studentId);
 

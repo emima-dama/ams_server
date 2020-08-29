@@ -1,6 +1,6 @@
 spring:
   application:
-    name: attendance-server
+    name: attendance-service
   datasource:
     url: jdbc:postgresql://postgres-attendance:5432/attendance-db
     username: attendance
@@ -20,6 +20,8 @@ eureka:
     register-with-eureka: true #tells the built-in eureka client to not register itself with eureka, because we should act as a server
     fetch-registry: true
 
+size.code: 20
+
 management:
   security:
     enable: false
@@ -27,7 +29,7 @@ management:
     web:
       base-path: /attendance-actuator
       exposure:
-        include: health, shutdown, prometheus, metrics
+        include: prometheus, metrics
   endpoint:
     shutdown:
       enable: true

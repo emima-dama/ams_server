@@ -24,7 +24,7 @@ management:
     web:
       base-path: /assignment-actuator
       exposure:
-        include: health, shutdown, prometheus, metrics
+        include: prometheus, metrics
   endpoint:
     shutdown:
       enable: true

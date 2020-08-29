@@ -11,7 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ro.ubbcluj.cs.ams.assignment.dto.*;
+import ro.ubbcluj.cs.ams.assignment.dto.GradeDto;
+import ro.ubbcluj.cs.ams.assignment.dto.GradeResponseDto;
+import ro.ubbcluj.cs.ams.assignment.dto.GradesResponseDto;
 import ro.ubbcluj.cs.ams.assignment.service.Service;
 import ro.ubbcluj.cs.ams.assignment.service.exception.AssignmentServiceException;
 import ro.ubbcluj.cs.ams.assignment.service.exception.AssignmentServiceExceptionType;
@@ -78,11 +80,27 @@ public class AssignmentController {
     @RequestMapping(value = "/student", method = RequestMethod.GET,params={"id"},produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GradesResponseDto> findGradesByStudent2(@RequestParam(name = "id")String id, Principal principal) {
 
-        logger.info(">>>>>>>>>>>>> LOGGING findGradesByStudent {} <<<<<<<<<<<<<<<<",principal.getName());
+        logger.info(">>>>>>>>>>>>> LOGGING findGradesByStudent2 {} <<<<<<<<<<<<<<<<",principal.getName());
 
         GradesResponseDto gradeResponseDto = service.findGradesByStudent(id);
 
-        logger.info(">>>>>>>>>>>>> SUCCESSFUL LOGGING assignGrade <<<<<<<<<<<<<<<<");
+        logger.info(">>>>>>>>>>>>> SUCCESSFUL LOGGING findGradesByStudent2 <<<<<<<<<<<<<<<<");
+        return new ResponseEntity<>(gradeResponseDto, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Find all grades of a student")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "SUCCESS", response = GradeResponseDto.class),
+            @ApiResponse(code = 400, message = "INVALID_GRADE", response = AssignmentServiceExceptionType.class),
+    })
+    @RequestMapping(value = "/grades", method = RequestMethod.GET,params={"subject"},produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GradesResponseDto> findGradesBySubject(@RequestParam(name = "subject")String subject, Principal principal) {
+
+        logger.info(">>>>>>>>>>>>> LOGGING findGradesBySubject {} <<<<<<<<<<<<<<<<",principal.getName());
+
+        GradesResponseDto gradeResponseDto = service.findGradesBySubject(subject,principal.getName());
+
+        logger.info(">>>>>>>>>>>>> SUCCESSFUL LOGGING findGradesBySubject <<<<<<<<<<<<<<<<");
         return new ResponseEntity<>(gradeResponseDto, HttpStatus.OK);
     }
 }

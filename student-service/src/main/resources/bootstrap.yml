@@ -28,12 +28,10 @@ management:
     web:
       base-path: /student-actuator
       exposure:
-        include: health, shutdown, prometheus, metrics
+        include: prometheus, metrics
   endpoint:
     shutdown:
       enable: true
-  #    health:
-  #      show-details: always
   metrics:
     export:
       prometheus:
